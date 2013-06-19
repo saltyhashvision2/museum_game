@@ -11,14 +11,13 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback{
-	int missionID;		// record the mission number 
 	int questionID;		// record the question number 
 	int status;			// record the game progress 
 	int timeCounter;	// current time counter 
 	DrawThread dt;		// draw screen thread 
 	ArrayList<Question> allQuestion = new ArrayList<Question>(5);
 	ArrayList<Rect> allCandidate = new ArrayList<Rect>(3);
-	
+	Mission mission;	// mission
 	//Rect rectQuestion;
 	//Rect rectAntique;
 	
@@ -37,8 +36,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	public GameView(CreativeMusem father, int missionID) {
 		super(father);				
 		getHolder().addCallback(this);
-		this.missionID = missionID;	/* get mission id */
-		initMissionResource(father, missionID);			
+		mission = new Mission(missionID);
+		mission.initMission(father);			
 		
 		/* init game settings */
 		this.missionID = missionID;
@@ -99,60 +98,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     	//rectAntique = new Rect();
     	
     }
-	
-	/* Initialize question and antiques according to mission id */
-	public void initMissionResource(Context context,int missionID){
-		Resources r = context.getResources();
-		if(missionID == 1)
-		{
-			/* Mission one object */
-			Question q1 = new Question();
-			q1.bmpantique = BitmapFactory.decodeResource(r,R.drawable.ic_launcher);
-			q1.answer = Question.CHOICE_A;
-			q1.question = R.string.m1_q1;
-			q1.candidate.add(R.string.m1_q1_a1);
-			q1.candidate.add(R.string.m1_q1_a2);
-			q1.candidate.add(R.string.m1_q1_a3);
-			Question q2 = new Question();
-			q2.bmpantique = BitmapFactory.decodeResource(r,R.drawable.ic_launcher);
-			q2.answer = Question.CHOICE_C;
-			q2.question = R.string.m1_q2;
-			q2.candidate.add(R.string.m1_q2_a1);
-			q2.candidate.add(R.string.m1_q2_a2);
-			q2.candidate.add(R.string.m1_q2_a3);
-			Question q3 = new Question();
-			q3.bmpantique = BitmapFactory.decodeResource(r,R.drawable.ic_launcher);
-			q3.answer = Question.CHOICE_B;
-			q3.question = R.string.m1_q3;
-			q3.candidate.add(R.string.m1_q3_a1);
-			q3.candidate.add(R.string.m1_q3_a2);
-			q3.candidate.add(R.string.m1_q3_a3);
-			Question q4 = new Question();
-			q4.bmpantique = BitmapFactory.decodeResource(r,R.drawable.ic_launcher);
-			q4.answer = Question.CHOICE_C;
-			q4.question = R.string.m1_q4;
-			q4.candidate.add(R.string.m1_q4_a1);
-			q4.candidate.add(R.string.m1_q4_a2);
-			q4.candidate.add(R.string.m1_q4_a3);
-			Question q5 = new Question();
-			q5.bmpantique = BitmapFactory.decodeResource(r,R.drawable.ic_launcher);
-			q5.answer = Question.CHOICE_B;
-			q5.question = R.string.m1_q5;
-			q5.candidate.add(R.string.m1_q5_a1);
-			q5.candidate.add(R.string.m1_q5_a2);
-			q5.candidate.add(R.string.m1_q5_a3);
-			
-			/* add all question to arraylist */
-			allQuestion.add(q1);
-			allQuestion.add(q2);
-			allQuestion.add(q3);
-			allQuestion.add(q4);
-			allQuestion.add(q5);	
-		}
-		
-		/* check if we need to separate mission to another class */
-		
-	}
 	
 	// Handle onTouchEvent in main activity
 	public void touchEvent(int x, int y){
