@@ -11,6 +11,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback{
+	int missionID;
 	int questionID;		// record the question number 
 	int status;			// record the game progress 
 	int timeCounter;	// current time counter 
@@ -18,6 +19,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	ArrayList<Question> allQuestion = new ArrayList<Question>(5);
 	ArrayList<Rect> allCandidate = new ArrayList<Rect>(3);
 	Mission mission;	// mission
+	Rect [] rectCandidate;
 	//Rect rectQuestion;
 	//Rect rectAntique;
 	
@@ -90,9 +92,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	
 	//initialize touch rectangular range 
 	public void initRects(){
-    	Rect candidate = new Rect();
+		rectCandidate = new Rect[3];
     	for(int i=0;i<3;i++){
-    		//allCandidate.a = new Rect(244,200+40*i,280,236+40*i);
+    		rectCandidate[i] = new Rect(244,200+40*i,280,236+40*i);
     	}
     	//rectQuestion = new Rect();
     	//rectAntique = new Rect();
