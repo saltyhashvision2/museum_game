@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">pushpullgame</string>
+    <string name="app_name">MusemGame</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-
+	<string name="m1_q1">Mission1[Q1]</string>
+	<string name="m1_q1_a1">Mission1[Q1]:Ans1</string>
+	<string name="m1_q1_a2">Mission1[Q1]:Ans2</string>
+	<string name="m1_q1_a3">Mission1[Q1]:Ans3</string>
+	<string name="m1_q2">Mission1[Q2]</string>
+	<string name="m1_q2_a1">Mission1[Q2]:Ans1</string>
+	<string name="m1_q2_a2">Mission1[Q2]:Ans2</string>
+	<string name="m1_q2_a3">Mission1[Q2]:Ans3</string>
+	<string name="m1_q3">Mission1[Q3]</string>
+	<string name="m1_q3_a1">Mission1[Q3]:Ans1</string>
+	<string name="m1_q3_a2">Mission1[Q3]:Ans2</string>
+	<string name="m1_q3_a3">Mission1[Q3]:Ans3</string>
+	<string name="m1_q4">Mission1[Q4]</string>
+	<string name="m1_q4_a1">Mission1[Q4]:Ans1</string>
+	<string name="m1_q4_a2">Mission1[Q4]:Ans2</string>
+	<string name="m1_q4_a3">Mission1[Q4]:Ans3</string>
+	<string name="m1_q5">Mission1[Q5]</string>
+	<string name="m1_q5_a1">Mission1[Q5]:Ans1</string>
+	<string name="m1_q5_a2">Mission1[Q5]:Ans2</string>
+	<string name="m1_q5_a3">Mission1[Q5]:Ans3</string>
 </resources>
