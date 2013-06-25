@@ -10,7 +10,7 @@ public class DrawThread extends Thread{
 	boolean isGameOn = true;
 	int sleepSpan = 20;		
 	
-	/* contructor */
+	/* constructor */
 	public DrawThread(GameView father,SurfaceHolder surfaceHolder){
 		super.setName("##-DrawThread");			// set thread name, for debug
 		this.father = father;				
