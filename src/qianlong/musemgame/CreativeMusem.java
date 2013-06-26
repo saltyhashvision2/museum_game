@@ -7,15 +7,16 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class CreativeMusem extends Activity {
+	MainView mv;
 	GameView gv;		//game view
 	View     current;	//current view
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		gv = new GameView(this,1);
-		setContentView(gv);
-		current = gv;
+		mv = new MainView(this);
+		setContentView(mv);
+		current = mv;
 	}
 	
 	@Override
@@ -24,8 +25,8 @@ public class CreativeMusem extends Activity {
 		if(event.getAction() == MotionEvent.ACTION_UP){
 			int x = (int)event.getX();		//get x-coordinate of touch
 			int y = (int)event.getY();		//get y-coordinate of touch
-			if(current == gv){
-				gv.touchEvent(x,y);	//for GameView to handle touch event
+			if(current == mv){
+				mv.touchEvent(x,y);	//for MainView to handle touch event
 			}
 		}
 		
