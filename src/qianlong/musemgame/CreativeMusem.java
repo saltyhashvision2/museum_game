@@ -12,6 +12,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.util.Log;
 
+
 public class CreativeMusem extends Activity {
 	GameView gv;		//game view
 	MainView mainview;  //main view
@@ -19,7 +20,7 @@ public class CreativeMusem extends Activity {
 	Bitmap start;
 	Bitmap quit;
 	Bitmap config;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -32,34 +33,82 @@ public class CreativeMusem extends Activity {
 		//gv = new GameView(this,1);
 		setContentView(mainview);
 		current = mainview;
-		initBitmap();		//初始化用於匹配點擊事件的矩形框
 	}
-    //方法：初始化矩形框
-    public void initBitmap(){
-    	start = BitmapFactory.decodeResource(getResources(), R.drawable.start);
-    	quit = BitmapFactory.decodeResource(getResources(), R.drawable.quit);
-    	config = BitmapFactory.decodeResource(getResources(), R.drawable.config);
-    }
     
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if(event.getAction() == MotionEvent.ACTION_UP){
 			int x = (int)event.getX();		//get x-coordinate of touch
 			int y = (int)event.getY();		//get y-coordinate of touch				
-			if(current == mainview){//如果目前介面是歡迎介面
-				if(x > 205 && x < start.getWidth()+205 &&
-						y > 425 && y < start.getHeight()+425 ){
-					Log.d("TAG", "This is rectStart!");
-				}else if(x > 205 && x < quit.getWidth()+205 &&
-						y > 525 && y < start.getHeight()+525 ){
-					Log.d("TAG", "This is rectQuit!");
-					//System.exit(0);
-				}else if(x > 25 && x < config.getWidth()+25 &&
-						y > 425 && y < config.getHeight()+425 ){
-					Log.d("TAG", "This is rectConfig!");
+			if(current == mainview) {
+				switch(mainview.view){
+				case 0://MainView
+					if(x > mainview.start_x && x < (mainview.start_x + mainview.bmpStart.getWidth()) &&
+							y > mainview.start_y && y < (mainview.start_y + mainview.bmpStart.getHeight()) ) {
+						Log.d("TAG", "Start in Main View!");
+						mainview.view = 1;//change to Game Description View
+					}else if(x > mainview.config_x && x < (mainview.config_x + mainview.bmpConfig.getWidth()) &&
+							y > mainview.config_y && y < (mainview.config_y + mainview.bmpConfig.getHeight()) ) {
+						Log.d("TAG", "Config in Main View!");
+						mainview.view = 4;//change to Game Configuration View
+					}else if(x > mainview.quit_x  && x < (mainview.quit_x + mainview.bmpQuit.getWidth()) &&
+							y > mainview.quit_y && y < (mainview.quit_y + mainview.bmpQuit.getHeight())) {
+						Log.d("TAG", "Quit in Main View!");
+						System.exit(0);
+					}else {
+						Log.d("TAG", "else in Main View!");
+					}
+					break;
+				case 1://Game Description View
+					if(x > mainview.next_x && x < (mainview.next_x + mainview.bmpNext.getWidth()) &&
+							y > mainview.next_y && y < (mainview.next_y + mainview.bmpNext.getHeight()) ) {
+						Log.d("TAG", "Next in Game Description View!");
+						mainview.view = 2;//change to Character Description View
+					}else if(x > mainview.exit_x && x < (mainview.exit_x + mainview.bmpExit.getWidth()) &&
+							y > mainview.exit_y && y < (mainview.exit_y + mainview.bmpExit.getHeight()) ) {
+						Log.d("TAG", "Exit in Game Description View!");
+						mainview.view = 0;//change to Main View
+					}else {
+						Log.d("TAG", "else in Game Description View!");
+					}
+					break;
+				case 2://Character Description View
+					if(x > mainview.next_x && x < (mainview.next_x + mainview.bmpNext.getWidth()) &&
+							y > mainview.next_y && y < (mainview.next_y + mainview.bmpNext.getHeight()) ) {
+						Log.d("TAG", "Next in Character Description View!");
+						mainview.view = 3;//change to Game Room View
+					}else if(x > mainview.exit_x && x < (mainview.exit_x + mainview.bmpExit.getWidth()) &&
+							y > mainview.exit_y && y < (mainview.exit_y + mainview.bmpExit.getHeight()) ) {
+						Log.d("TAG", "Exit in Character Description View!");
+						mainview.view = 0;//change to Main View
+					}else {
+						Log.d("TAG", "else in Character Description View!");
+					}
+					break;
+				case 3://Game Room View
+					if(x > mainview.start_x && x < (mainview.start_x + mainview.bmpStart.getWidth()) &&
+							y > mainview.start_y && y < (mainview.start_y + mainview.bmpStart.getHeight()) ) {
+						Log.d("TAG", "Start in Game Room View!");
+						//ToDo: change to game view ?
+					}else if(x > mainview.exit_x && x < (mainview.exit_x + mainview.bmpExit.getWidth()) &&
+							y > mainview.exit_y && y < (mainview.exit_y + mainview.bmpExit.getHeight()) ) {
+						Log.d("TAG", "Exit in Game Room View!");
+						mainview.view = 0;//change to Main View
+					}else {
+						Log.d("TAG", "else in Game Room View!");
+					}
+					break;
+				case 4://Game Configuration View
+					if(x > mainview.exit_x && x < (mainview.exit_x + mainview.bmpExit.getWidth()) &&
+							y > mainview.exit_y && y < (mainview.exit_y + mainview.bmpExit.getHeight()) ) {
+						Log.d("TAG", "Exit in Game Configuration View!");
+						mainview.view = 0;//change to Main View
+					}else {
+						Log.d("TAG", "This is else in Game Configuration View!");
+					}
+					break;
 				}
-			}
-			else if(current == gv){
+			}else if(current == gv){
 				gv.touchEvent(x,y);	//for GameView to handle touch event
 			}
 		}
