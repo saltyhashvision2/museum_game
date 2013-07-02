@@ -10,9 +10,9 @@ public class Question {
 	ArrayList<String> candidate;	//answer candidate string
 	Antique antique;
 
-	public static final int CHOICE_A = 1;
-	public static final int CHOICE_B = 2;
-	public static final int CHOICE_C = 3;
+	public static final int CHOICE_A = 0;
+	public static final int CHOICE_B = 1;
+	public static final int CHOICE_C = 2;
 
 	private static final int CANDIDATE_NUM = 3;
 	//constructor

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -38,12 +39,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		mission.initMission(father);			
 		
 		initRects();
-		
-		current = mission.question.get(questionID);
 		/* init game settings */
 		this.missionID = missionID;
 		this.questionID = 1;
 		this.status = BEFORE_QUESTION;
+		
+		current = mission.question.get(questionID-1);
+		
 		
 		dt = new DrawThread(this, getHolder());
 		//this.father = father;
@@ -63,26 +65,32 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		
 		switch(status){
 			case BEFORE_QUESTION:
-				canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
+				//canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
+				Log.d("GameView", "timeCounter"+timeCounter);
 				timeCounter++;
 				if(timeCounter == WAIT_BEFORE_QUESTION){
+					Log.d("GameView", "BEFORE -> BEGIN");
 					status = BEGIN_QUESTION;
 					timeCounter = 0;
 				}
 				break;
 			case BEGIN_QUESTION:		
-				canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
-				canvas.drawText(current.question, 30, 60, null);        //drawQuestionID();
-				canvas.drawText(current.candidate.get(Question.CHOICE_A), 60, 30, null);
-				canvas.drawText(current.candidate.get(Question.CHOICE_B), 60, 60, null);
-				canvas.drawText(current.candidate.get(Question.CHOICE_C), 60, 90, null);
+				//canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
+				//canvas.drawText(current.question, 30, 60, null);        //drawQuestionID();
+				//canvas.drawText(current.candidate.get(Question.CHOICE_A), 60, 30, null);
+				//canvas.drawText(current.candidate.get(Question.CHOICE_B), 60, 60, null);
+				//canvas.drawText(current.candidate.get(Question.CHOICE_C), 60, 90, null);
+				Log.d("GameView", "timeCounter"+timeCounter);
 				timeCounter++;
 				if(current.choice != 0){
+					Log.d("GameView", "BEGIN -> AFTER");
 					status = AFTER_QUESTION;
 					timeCounter = 0;
 				}
 				
 				if(timeCounter == WAIT_USER_CHOOSE){
+					Log.d("GameView","User don't choose any answer");
+					Log.d("GameView", "BEGIN -> AFTER");
 					status = AFTER_QUESTION;
 					timeCounter = 0;
 					current.choice = Question.CHOICE_A;
@@ -90,19 +98,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 					
 				break;
 			case AFTER_QUESTION:
-				canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
-				canvas.drawText(current.question,30,60,null);        //drawQuestionID();
+				//canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
+				//canvas.drawText(current.question,30,60,null);        //drawQuestionID();
 				//this should be drawed according to answer's position
-				canvas.drawText(current.candidate.get(current.choice), 60, 30, null);
+				//canvas.drawText(current.candidate.get(current.choice), 60, 30, null);
+				Log.d("GameView", "timeCounter"+timeCounter);
 				timeCounter++;
 				if(timeCounter == WAIT_AFTER_QUESTION){
 					timeCounter = 0;
 					if(questionID == QUESTION_NUMBER){
+						Log.d("GameView","end of question");
 						dt.isGameOn = false;
 					}
 					else{
 						questionID++;
-						current = mission.question.get(questionID);
+						Log.d("GameView","question "+questionID);
+						current = mission.question.get(questionID-1);
+						Log.d("GameView", "AFTER -> BEFORE");
 						status = BEFORE_QUESTION;
 					}
 				}	
@@ -150,15 +162,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	}
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		//if(!dt.isAlive()){
-		//	dt.start();
-		//}			 
+		if(!dt.isAlive()){
+			dt.start();
+		}			 
         //father.pmt = new PlayerMoveThread(father);//初始化並啟動球員的移動處理執行緒
         //father.pmt.start();
 	}
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		//dt.isGameOn = false;	//停止更新螢幕執行緒的執行
+		dt.isGameOn = false;	//停止更新螢幕執行緒的執行
 		//father.pmt.flag = false;
 	}
 }
