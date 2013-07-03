@@ -1,7 +1,8 @@
 package qianlong.musemgame;
 
-import android.graphics.Canvas;		
-import android.view.SurfaceHolder;	
+import android.util.Log;
+import android.graphics.Canvas;
+import android.view.SurfaceHolder;
 
 public class MainDrawThread extends Thread{
 	MainView father;				
@@ -11,13 +12,15 @@ public class MainDrawThread extends Thread{
 	
 	/* Constructor */
 	public MainDrawThread(MainView father, SurfaceHolder surfaceHolder) {
-		//super.setName("##-MainDrawThread"); // set thread name, for debug
+		Log.d("DrawThread", "MainDrawThread is created...");
+		super.setName("##-MainDrawThread"); // set thread name, for debug
 		this.father = father;
 		this.surfaceHolder = surfaceHolder;
 		flag = true;
 	}
 	
 	public void run() {
+		Log.d("DrawThread", "MainDrawThread is running... (flag=" + flag + ")");
 		Canvas canvas = null;
 		while (flag) {
 			try {

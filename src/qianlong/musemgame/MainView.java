@@ -1,5 +1,6 @@
 package qianlong.musemgame;
 
+import android.util.Log;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;	
@@ -19,8 +20,8 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback {
 	Bitmap bmpGameConfiguration;
 	// Positions : {left, top}
 	int [] posGameStartFirst = {10, 10};
-	int [] posGameStartAgain = {10, 80};
-	int [] posGameConfiguration = {10, 150};
+	int [] posGameStartAgain = {10, 113};
+	int [] posGameConfiguration = {10, 215};
 	// Rects
 	Rect rectGameStartFirst;
 	Rect rectGameStartAgain;
@@ -28,14 +29,15 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback {
 	
 	public MainView(CreativeMusem father) {
 		super(father);
+		Log.d("View", "MainView is created...");
 		this.father = father;
 		getHolder().addCallback(this);
 		initBitmap(father);
+		initRects();
 		mdt = new MainDrawThread(this, getHolder());
 	}
 	
 	public void doDraw(Canvas canvas) {
-		initRects();
 		Paint paint = new Paint();
 		canvas.drawBitmap(bmpGameStartFirst, posGameStartFirst[0], posGameStartFirst[1], paint);
 		canvas.drawBitmap(bmpGameStartAgain, posGameStartAgain[0], posGameStartAgain[1], paint);
@@ -50,19 +52,49 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	
 	public void initRects() {
+		Log.d("MainView", "Bitmap-Game Start First (width = " + bmpGameStartFirst.getWidth() +
+				", height = " + bmpGameStartFirst.getHeight() + ")");
 		rectGameStartFirst = new Rect(posGameStartFirst[0], posGameStartFirst[1],
 				posGameStartFirst[0]+bmpGameStartFirst.getWidth(),
 				posGameStartFirst[1]+bmpGameStartFirst.getHeight());
+		Log.d("MainView", "Rect-Game Start First (left = " + rectGameStartFirst.left +
+				", right = " + rectGameStartFirst.right + ", top = " + rectGameStartFirst.top +
+				", bottom = " + rectGameStartFirst.bottom + ")");
+		
+		Log.d("MainView", "Bitmap-Game Start Again (width = " + bmpGameStartAgain.getWidth() +
+				", height = " + bmpGameStartAgain.getHeight() + ")");
 		rectGameStartAgain = new Rect(posGameStartAgain[0], posGameStartAgain[1],
 				posGameStartAgain[0]+bmpGameStartAgain.getWidth(),
 				posGameStartAgain[1]+bmpGameStartAgain.getHeight());
+		Log.d("MainView", "Rect-Game Start Again (left = " + rectGameStartAgain.left +
+				", right = " + rectGameStartAgain.right + ", top = " + rectGameStartAgain.top +
+				", bottom = " + rectGameStartAgain.bottom + ")");
+		
+		Log.d("MainView", "Bitmap-Game Configuration (width = " + bmpGameConfiguration.getWidth() +
+				", height = " + bmpGameConfiguration.getHeight() + ")");
 		rectGameConfiguration = new Rect(posGameConfiguration[0], posGameConfiguration[1],
 				posGameConfiguration[0]+bmpGameConfiguration.getWidth(),
 				posGameConfiguration[1]+bmpGameConfiguration.getHeight());
+		Log.d("MainView", "Rect-Game Configuration (left = " + rectGameConfiguration.left +
+				", right = " + rectGameConfiguration.right + ", top = " + rectGameConfiguration.top +
+				", bottom = " + rectGameConfiguration.bottom + ")");
 	}
 	
 	public void touchEvent(int x, int y) {
-		
+		// Log touch position
+		Log.d("MainView", "Touch Position = (" + x + ", " + y + ")");
+		if (rectGameStartFirst.contains(x, y)) {
+			Log.d("MainView", "Touch - Game Start First");
+			//father.changeGameDescriptionView();
+		} else if (rectGameStartAgain.contains(x, y)) {
+			Log.d("MainView", "Touch - Game Start Again");
+			father.changeGameView();
+		} else if (rectGameConfiguration.contains(x, y)) {
+			Log.d("MainView", "Touch - Game Configuration");
+			//father.changeGameConfigurationView();
+		} else {
+			// touch other position
+		}
 	}
 	
 	@Override
