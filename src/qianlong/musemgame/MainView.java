@@ -23,10 +23,13 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback{
 	Bitmap bmpConfig;			//設定按鈕圖片
 	Bitmap bmpExit;				//Exit Button
 	Bitmap bmpNext;
+	Bitmap bmpSoundOn, bmpSoundOff;
+	Bitmap bmpMusicOn, bmpMusicOff;
 	int alpha = 255;			//透明度，初始為255，即不透明
 	int view=-1;
 	int start_x, start_y, quit_x, quit_y;
 	int config_x, config_y, exit_x, exit_y;
+	int music_x, music_y, sound_x, sound_y;
 	int next_x, next_y;
 	private int mWidth;
 	private int mHeight;
@@ -61,6 +64,10 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback{
 		bmpExit = BitmapFactory.decodeResource(r, R.drawable.exit);
 		bmpNext = BitmapFactory.decodeResource(r, R.drawable.next);
 		bmpConfig = BitmapFactory.decodeResource(r, R.drawable.game_configuration);
+		bmpMusicOn = BitmapFactory.decodeResource(r, R.drawable.music_on);
+		bmpMusicOff = BitmapFactory.decodeResource(r, R.drawable.music_off);
+		bmpSoundOn = BitmapFactory.decodeResource(r, R.drawable.sound_on);
+		bmpSoundOff = BitmapFactory.decodeResource(r, R.drawable.sound_off);
 	}
 
 	public void doDraw(Canvas canvas) {//方法：用於根據不同狀態繪製螢幕
@@ -78,9 +85,9 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback{
 			quit_x = (mWidth - bmpQuit.getWidth()) / 2;
 			quit_y = config_y + bmpConfig.getHeight();
 
-			canvas.drawBitmap(bmpStart, start_x, start_y, paint);	//draw start button
-			canvas.drawBitmap(bmpConfig, config_x, config_y, paint);
-			canvas.drawBitmap(bmpQuit, quit_x, quit_y , paint);	//draw exit button
+			canvas.drawBitmap(bmpStart, start_x, start_y, paint);//1st picture
+			canvas.drawBitmap(bmpConfig, config_x, config_y, paint);//2nd picture
+			canvas.drawBitmap(bmpQuit, quit_x, quit_y , paint);//3rd picture
 			break;
 		case 1://Game Description View
 			canvas.drawColor(Color.BLACK);			//Clear screen
@@ -90,8 +97,8 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback{
 			exit_y = (mHeight - bmpExit.getHeight()) / 2;//center
 			next_x = (mWidth - bmpNext.getWidth()) / 2;
 			next_y = exit_y - bmpNext.getHeight();
-			canvas.drawBitmap(bmpNext, next_x, next_y, paint);
-			canvas.drawBitmap(bmpExit, exit_x, exit_y, paint);
+			canvas.drawBitmap(bmpNext, next_x, next_y, paint);//1st picture
+			canvas.drawBitmap(bmpExit, exit_x, exit_y, paint);//2nd picture
 			break;
 		case 2://Character Description View
 			canvas.drawColor(Color.BLACK);			//Clear screen
@@ -101,8 +108,8 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback{
 			exit_y = (mHeight - bmpExit.getHeight()) / 2;//center
 			next_x = (mWidth - bmpNext.getWidth()) / 2;
 			next_y = exit_y - bmpNext.getHeight();
-			canvas.drawBitmap(bmpNext, next_x, next_y, paint);
-			canvas.drawBitmap(bmpExit, exit_x, exit_y, paint);
+			canvas.drawBitmap(bmpNext, next_x, next_y, paint);//1st picture
+			canvas.drawBitmap(bmpExit, exit_x, exit_y, paint);//2nd picture
 			break;
 		case 3://Game Room Description View
 			canvas.drawColor(Color.BLACK);			//Clear screen
@@ -112,15 +119,31 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback{
 			exit_y = (mHeight - bmpExit.getHeight()) / 2;//center
 			start_x = (mWidth - bmpStart.getWidth()) / 2;
 			start_y = exit_y - bmpStart.getHeight();
-			canvas.drawBitmap(bmpStart, start_x, start_y, paint);
-			canvas.drawBitmap(bmpExit, exit_x, exit_y, paint);
+			canvas.drawBitmap(bmpStart, start_x, start_y, paint);//1st picture
+			canvas.drawBitmap(bmpExit, exit_x, exit_y, paint);//2nd picture
 			break;
 		case 4://Game Configuration View
 			canvas.drawColor(Color.BLACK);			//Clear screen
 			canvas.drawBitmap(bmpBackGameConfigView, 0, 0, paint);	//draw background
 			exit_x = (mWidth - bmpExit.getWidth()) / 2;//center
 			exit_y = (mHeight - bmpExit.getHeight()) / 2;//center
-			canvas.drawBitmap(bmpExit, exit_x, exit_y, paint);
+			sound_x = (mWidth - bmpSoundOn.getWidth()) / 2;
+			sound_y = exit_y - bmpSoundOn.getHeight();
+			music_x = (mWidth - bmpMusicOn.getWidth()) / 2;
+			music_y = sound_y - bmpMusicOn.getHeight();
+			if(father.wantMusic){//1st picture
+				canvas.drawBitmap(bmpMusicOff, music_x, music_y, paint);
+			}else{
+				canvas.drawBitmap(bmpMusicOn, music_x, music_y, paint);
+			}
+
+			if(father.wantSound){//2nd picture
+				canvas.drawBitmap(bmpSoundOff, sound_x, sound_y, paint);
+			}else{
+				canvas.drawBitmap(bmpSoundOn, sound_x, sound_y, paint);
+			}
+
+			canvas.drawBitmap(bmpExit, exit_x, exit_y, paint);//3rd picture
 			break;
 		default:
 			break;

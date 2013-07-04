@@ -2,8 +2,10 @@ package qianlong.musemgame;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Rect;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -20,10 +22,14 @@ public class CreativeMusem extends Activity {
 	Bitmap start;
 	Bitmap quit;
 	Bitmap config;
+	boolean wantMusic = true;
+	boolean wantSound = true;
+	MediaPlayer mpBackGroundMusic;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		initBackGroundMusic(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);	//³]©w¥þ¿Ã¹õ
         getWindow().setFlags(
         		WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -33,8 +39,14 @@ public class CreativeMusem extends Activity {
 		//gv = new GameView(this,1);
 		setContentView(mainview);
 		current = mainview;
+		if(wantMusic && mpBackGroundMusic!=null){
+			mpBackGroundMusic.setLooping(true);
+			mpBackGroundMusic.start();
+		}
 	}
-    
+	public void initBackGroundMusic(Context context){
+		mpBackGroundMusic = MediaPlayer.create(context, R.raw.back_ground_music);
+	}
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if(event.getAction() == MotionEvent.ACTION_UP){
@@ -99,7 +111,20 @@ public class CreativeMusem extends Activity {
 					}
 					break;
 				case 4://Game Configuration View
-					if(x > mainview.exit_x && x < (mainview.exit_x + mainview.bmpExit.getWidth()) &&
+					if(x > mainview.music_x && x < (mainview.music_x + mainview.bmpMusicOn.getWidth()) &&
+							y > mainview.music_y && y < (mainview.music_y + mainview.bmpMusicOn.getHeight()) ) {
+						Log.d("TAG", "On/Off Music in Game Configuration View!");
+						wantMusic = !(wantMusic);
+						if(!wantMusic && mpBackGroundMusic.isPlaying()){
+							mpBackGroundMusic.pause();
+						}else if(wantMusic && !mpBackGroundMusic.isPlaying()){
+							mpBackGroundMusic.start();
+						}
+					}else if(x > mainview.sound_x && x < (mainview.sound_x + mainview.bmpSoundOn.getWidth()) &&
+							y > mainview.sound_y && y < (mainview.sound_y + mainview.bmpSoundOn.getHeight()) ) {
+						Log.d("TAG", "On/Off Sound in Game Configuration View!");
+						wantSound = !(wantSound);
+					}else if(x > mainview.exit_x && x < (mainview.exit_x + mainview.bmpExit.getWidth()) &&
 							y > mainview.exit_y && y < (mainview.exit_y + mainview.bmpExit.getHeight()) ) {
 						Log.d("TAG", "Exit in Game Configuration View!");
 						mainview.view = 0;//change to Main View
