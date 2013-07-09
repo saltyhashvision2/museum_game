@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 public class CreativeMusem extends Activity {
 	MainView mv;
@@ -21,6 +23,11 @@ public class CreativeMusem extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		getWindow().setFlags(
+        		WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        		WindowManager.LayoutParams.FLAG_FULLSCREEN
+        		);
 		mv = new MainView(this);
 		setContentView(mv);
 		current = mv;
@@ -45,9 +52,9 @@ public class CreativeMusem extends Activity {
 			} else if (current == gv) {
 				gv.touchEvent(x, y);
 			} else if (current == rv) {
-				
+				rv.touchEvent(x, y);
 			} else if (current == odv) {
-				
+				odv.touchEvent(x, y);
 			} else {
 				// current is fail !
 			}
@@ -55,12 +62,18 @@ public class CreativeMusem extends Activity {
 		
 		return true;
 	}
-	
+	/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.creative_musem, menu);
 		return true;
+	}
+	*/
+	public void changeMainView() {
+		mv = new MainView(this);
+		this.setContentView(mv);
+		this.current = mv;
 	}
 	
 	public void changeGameDescriptionView() {
@@ -87,5 +100,11 @@ public class CreativeMusem extends Activity {
 		rv = new ResultsView(this);
 		this.setContentView(rv);
 		this.current = rv;
+	}
+	
+	public void changeObjectDescriptionView() {
+		odv = new ObjectDescriptionView(this);
+		this.setContentView(odv);
+		this.current = odv;
 	}
 }
