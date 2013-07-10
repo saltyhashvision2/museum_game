@@ -152,7 +152,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		*/
 		if (rectGameExit.contains(x, y)) {
 			Log.d("GameView", "Touch - Game Exit");
-			father.changeResultsView();
+			father.changeResultsView(mission);
 		}
 	}
 	

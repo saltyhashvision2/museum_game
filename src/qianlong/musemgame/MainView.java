@@ -88,7 +88,8 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback {
 			//father.changeGameDescriptionView();
 		} else if (rectGameStartAgain.contains(x, y)) {
 			Log.d("MainView", "Touch - Game Start Again");
-			father.changeGameView();
+			// TODO: get previous mission ID
+			father.changeGameView(1);
 		} else if (rectGameConfiguration.contains(x, y)) {
 			Log.d("MainView", "Touch - Game Configuration");
 			//father.changeGameConfigurationView();

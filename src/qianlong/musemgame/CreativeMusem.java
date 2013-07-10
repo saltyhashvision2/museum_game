@@ -88,22 +88,20 @@ public class CreativeMusem extends Activity {
 		this.current = gcv;
 	}
 	
-	public void changeGameView() {
-		// Get previous "mission" ID
-		int previous_mission_id = 1;
-		gv = new GameView(this, previous_mission_id);
+	public void changeGameView(int missionID) {
+		gv = new GameView(this, missionID);
 		this.setContentView(gv);
 		this.current = gv;
 	}
 	
-	public void changeResultsView() {
-		rv = new ResultsView(this);
+	public void changeResultsView(Mission mission) {
+		rv = new ResultsView(this, mission);
 		this.setContentView(rv);
 		this.current = rv;
 	}
 	
-	public void changeObjectDescriptionView() {
-		odv = new ObjectDescriptionView(this);
+	public void changeObjectDescriptionView(Mission mission) {
+		odv = new ObjectDescriptionView(this, mission);
 		this.setContentView(odv);
 		this.current = odv;
 	}

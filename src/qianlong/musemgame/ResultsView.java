@@ -15,6 +15,7 @@ import android.view.SurfaceView;
 public class ResultsView extends SurfaceView implements SurfaceHolder.Callback {
 	CreativeMusem father;
 	ResultsDrawThread rdt;
+	Mission mission_result;
 	int intScreenWidth = 0;
 	int intScreentHeight = 0;
 	int intCollectedPicNumber = 0;
@@ -26,8 +27,8 @@ public class ResultsView extends SurfaceView implements SurfaceHolder.Callback {
 	int intWidthOfAntique = 90;
 	int intHeightOfAntique = 150;
 	// String
-	String strMission = "Mission";
-	String strScore = "Score";
+	String strMission = "Mission ";
+	String strScore = "Score ";
 	String strCollectedPic = "Collected Pic";
 	String strMissedPic = "Missed Pic";
 	// Bitmaps
@@ -61,11 +62,11 @@ public class ResultsView extends SurfaceView implements SurfaceHolder.Callback {
 	Rect rectButtonPlayNext;
 	Rect rectButtonHome;
 	
-	public ResultsView(CreativeMusem father) {
-		// TODO: Input Mission
+	public ResultsView(CreativeMusem father, Mission mission) {
 		super(father);
 		Log.d("View", "ResultsView is created...");
 		this.father = father;
+		this.mission_result = mission;
 		getHolder().addCallback(this);
 		initBitmap(father);
 		initRects();
@@ -84,10 +85,9 @@ public class ResultsView extends SurfaceView implements SurfaceHolder.Callback {
 		
 		paint.setTextSize(28);
 		paint.setColor(Color.RED);
-		// TODO: Print mission id & score
 		// Default x:left y:baseline
-		canvas.drawText(strMission, posStrMission[0], posStrMission[1] + intHeightOfObject, paint);
-		canvas.drawText(strScore, posStrScore[0], posStrScore[1] + intHeightOfObject, paint);
+		canvas.drawText(strMission + mission_result.missionID, posStrMission[0], posStrMission[1] + intHeightOfObject, paint);
+		canvas.drawText(strScore + mission_result.score, posStrScore[0], posStrScore[1] + intHeightOfObject, paint);
 		canvas.drawText(strCollectedPic, posStrCollectedPic[0], posStrCollectedPic[1] + intHeightOfObject, paint);
 		canvas.drawText(strMissedPic, posStrMissedPic[0], posStrMissedPic[1] + intHeightOfObject, paint);
 		
@@ -194,12 +194,12 @@ public class ResultsView extends SurfaceView implements SurfaceHolder.Callback {
 		Log.d("ResultsView", "Touch Position = (" + x + ", " + y + ")");
 		if (rectButtonPlayAgain.contains(x, y)) {
 			Log.d("ResultsView", "Touch - Play Again");
-			// TODO: the same mission ID
-			father.changeGameView();
+			father.changeGameView(mission_result.missionID);
 		} else if (rectButtonPlayNext.contains(x, y)) {
 			Log.d("ResultsView", "Touch - Play Next");
-			// TODO: next mission ID
-			father.changeGameView();
+			// TODO: check if have next mission
+			int next_mission_id = mission_result.missionID + 1;
+			father.changeGameView(next_mission_id);
 		} else if (rectButtonHome.contains(x, y)) {
 			Log.d("ResultsView", "Touch - Home");
 			father.changeMainView();
@@ -207,14 +207,14 @@ public class ResultsView extends SurfaceView implements SurfaceHolder.Callback {
 			// Check collected pics
 			for (int collected_pic_index = 0 ; collected_pic_index < intCollectedPicNumber ; collected_pic_index++) {
 				if (rectCollectedPics[collected_pic_index].contains(x, y)) {
-					father.changeObjectDescriptionView();
+					father.changeObjectDescriptionView(mission_result);
 					break;
 				}
 			}
 			// Check missed pics
 			for (int missed_pic_index = 0 ; missed_pic_index < intMissedPicNumber ; missed_pic_index++) {
 				if (rectMissedPics[missed_pic_index].contains(x, y)) {
-					father.changeObjectDescriptionView();
+					father.changeObjectDescriptionView(mission_result);
 					break;
 				}
 			}

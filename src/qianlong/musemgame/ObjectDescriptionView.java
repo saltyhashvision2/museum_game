@@ -14,6 +14,7 @@ import android.view.SurfaceView;
 public class ObjectDescriptionView extends SurfaceView implements SurfaceHolder.Callback {
 	CreativeMusem father;
 	ObjectDescriptionDrawThread odt;
+	Mission mission_result;
 	// Bitmaps
 	Bitmap bmpReturn;
 	// Positions : {left, top}
@@ -21,10 +22,11 @@ public class ObjectDescriptionView extends SurfaceView implements SurfaceHolder.
 	// Rects
 	Rect rectReturn;
 	
-	public ObjectDescriptionView(CreativeMusem father) {
+	public ObjectDescriptionView(CreativeMusem father, Mission mission) {
 		super(father);
 		Log.d("View", "ObjectDescriptionView is created...");
 		this.father = father;
+		this.mission_result = mission;
 		getHolder().addCallback(this);
 		initBitmap(father);
 		initRects();
@@ -53,7 +55,7 @@ public class ObjectDescriptionView extends SurfaceView implements SurfaceHolder.
 		Log.d("ObjectDescriptionView", "Touch Position = (" + x + ", " + y + ")");
 		if (rectReturn.contains(x, y)) {
 			Log.d("ObjectDescriptionView", "Touch - Return");
-			father.changeResultsView();
+			father.changeResultsView(mission_result);
 		}
 	}
 	
