@@ -32,6 +32,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	private static final int WAIT_BEFORE_QUESTION = 10;
 	private static final int WAIT_AFTER_QUESTION = 10;
 	private static final int WAIT_USER_CHOOSE = 30;
+	
+	//view's height and width
+	private int mWidth;
+	private int mHeight;
+	
 	public GameView(CreativeMusem father, int missionID) {
 		super(father);				
 		getHolder().addCallback(this);
@@ -46,7 +51,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		
 		current = mission.question.get(questionID-1);
 		
-		
 		dt = new DrawThread(this, getHolder());
 		//this.father = father;
 		//this.clubID = clubID;		//獲得俱樂部logo		
@@ -58,14 +62,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		//ait = new AIThread(this);	//新建AI分析執行緒		
 		//bm = new BonusManager(this);//初始化BonusManager		
 		//dt = new DrawThread(this,getHolder());//新建後臺更新螢幕執行緒
-	}
-	
+	}	
+
 	/* screen drawing method */
 	protected void doDraw(Canvas canvas){
-		
+		// get width and height of canvas
+		mWidth = canvas.getWidth();
+		mHeight = canvas.getHeight();
 		switch(status){
 			case BEFORE_QUESTION:
-				//canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
+				canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
 				Log.d("GameView", "timeCounter"+timeCounter);
 				timeCounter++;
 				if(timeCounter == WAIT_BEFORE_QUESTION){
@@ -75,11 +81,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 				}
 				break;
 			case BEGIN_QUESTION:		
-				//canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
-				//canvas.drawText(current.question, 30, 60, null);        //drawQuestionID();
-				//canvas.drawText(current.candidate.get(Question.CHOICE_A), 60, 30, null);
-				//canvas.drawText(current.candidate.get(Question.CHOICE_B), 60, 60, null);
-				//canvas.drawText(current.candidate.get(Question.CHOICE_C), 60, 90, null);
+				canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
+				canvas.drawText(current.question, 30, 60, null);        //drawQuestionID();
+				canvas.drawText(current.candidate.get(Question.CHOICE_A), 60, 30, null);
+				canvas.drawText(current.candidate.get(Question.CHOICE_B), 60, 60, null);
+				canvas.drawText(current.candidate.get(Question.CHOICE_C), 60, 90, null);
 				Log.d("GameView", "timeCounter"+timeCounter);
 				timeCounter++;
 				if(current.choice != 0){
@@ -98,10 +104,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 					
 				break;
 			case AFTER_QUESTION:
-				//canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
-				//canvas.drawText(current.question,30,60,null);        //drawQuestionID();
+				canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
+				canvas.drawText(current.question,30,60,null);        //drawQuestionID();
 				//this should be drawed according to answer's position
-				//canvas.drawText(current.candidate.get(current.choice), 60, 30, null);
+				canvas.drawText(current.candidate.get(current.choice), 60, 30, null);
 				Log.d("GameView", "timeCounter"+timeCounter);
 				timeCounter++;
 				if(timeCounter == WAIT_AFTER_QUESTION){
@@ -149,6 +155,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		if(allCandidate.get(Question.CHOICE_C).contains(x, y)){
 			current.choice = Question.CHOICE_C;
 		}
+	}
+	
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+	{
+	    mWidth = MeasureSpec.getSize(widthMeasureSpec);
+	    mHeight = MeasureSpec.getSize(heightMeasureSpec);
+
+	    setMeasuredDimension(mWidth, mHeight);
 	}
 	
 	@Override
