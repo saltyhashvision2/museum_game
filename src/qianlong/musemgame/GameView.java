@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -29,14 +31,27 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	private static final int QUESTION_NUMBER = 5;
 	
 	//expire time between game status
-	private static final int WAIT_BEFORE_QUESTION = 10;
-	private static final int WAIT_AFTER_QUESTION = 10;
-	private static final int WAIT_USER_CHOOSE = 30;
+	private static final int WAIT_BEFORE_QUESTION = 100;
+	private static final int WAIT_AFTER_QUESTION = 100;
+	private static final int WAIT_USER_CHOOSE = 300;
 	
+	//TextSize 
+	private static final float TEXT_SIZE=16.0f;
 	//view's height and width
 	private int mWidth;
 	private int mHeight;
-	
+	//antique's height and width
+	private int antiqueWidth;
+	private int antiqueHeight;
+	private int antique_X;
+	private int antique_Y;
+    private int choiceA_X;
+    private int choiceA_Y;
+    private int choiceB_X;
+    private int choiceB_Y;
+    private int choiceC_X;
+    private int choiceC_Y;
+    
 	public GameView(CreativeMusem father, int missionID) {
 		super(father);				
 		getHolder().addCallback(this);
@@ -66,12 +81,31 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
 	/* screen drawing method */
 	protected void doDraw(Canvas canvas){
-		// get width and height of canvas
+		Paint paint = new Paint();		
+		
+		// calculate x,y coordinate 
 		mWidth = canvas.getWidth();
 		mHeight = canvas.getHeight();
+		antiqueWidth = current.antique.bmpAntique.getWidth();
+		antiqueHeight = current.antique.bmpAntique.getHeight();
+		antique_X = (mWidth/2-antiqueWidth)/2;
+		antique_Y = (mHeight/2-antiqueHeight)/2;
+		choiceA_X = mWidth/2;
+		choiceA_Y = mHeight/4;
+		choiceB_X = mWidth/2;
+		choiceB_Y = (mHeight*2)/4;
+		choiceC_X = mWidth/2;
+		choiceC_Y = (mHeight*3)/4;
+		
+		Log.d("GameView", "mWidth = "+mWidth);
+		Log.d("GameView", "mHeight = "+mHeight);
+		
+		canvas.drawColor(Color.BLACK); // clear screen
+		paint.setAlpha(255);
 		switch(status){
 			case BEFORE_QUESTION:
-				canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
+				//canvas.drawBitmap(bmpBackMainView, 0, 0, paint);	//draw background
+				canvas.drawBitmap(current.antique.bmpAntique, antique_X, antique_Y, null);
 				Log.d("GameView", "timeCounter"+timeCounter);
 				timeCounter++;
 				if(timeCounter == WAIT_BEFORE_QUESTION){
@@ -80,12 +114,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 					timeCounter = 0;
 				}
 				break;
-			case BEGIN_QUESTION:		
-				canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
-				canvas.drawText(current.question, 30, 60, null);        //drawQuestionID();
-				canvas.drawText(current.candidate.get(Question.CHOICE_A), 60, 30, null);
-				canvas.drawText(current.candidate.get(Question.CHOICE_B), 60, 60, null);
-				canvas.drawText(current.candidate.get(Question.CHOICE_C), 60, 90, null);
+			case BEGIN_QUESTION:	
+				canvas.drawBitmap(current.antique.bmpAntique, antique_X, antique_Y, null);
+				paint.setColor(Color.WHITE);
+				paint.setTextSize(dipToPs(TEXT_SIZE));
+				canvas.drawText(current.question, 0, (mHeight*3)/4, paint);        //drawQuestionID();
+				canvas.drawText(current.candidate.get(Question.CHOICE_A), choiceA_X, choiceA_Y, paint);
+				canvas.drawText(current.candidate.get(Question.CHOICE_B), choiceB_X, choiceB_Y, paint);
+				canvas.drawText(current.candidate.get(Question.CHOICE_C), choiceC_X, choiceC_Y, paint);
 				Log.d("GameView", "timeCounter"+timeCounter);
 				timeCounter++;
 				if(current.choice != 0){
@@ -104,10 +140,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 					
 				break;
 			case AFTER_QUESTION:
-				canvas.drawBitmap(current.antique.bmpAntique, 30, 30, null);
-				canvas.drawText(current.question,30,60,null);        //drawQuestionID();
+				canvas.drawBitmap(current.antique.bmpAntique, antique_X, antique_Y, null);
+				paint.setColor(Color.WHITE);
+				paint.setTextSize(dipToPs(TEXT_SIZE));
+				canvas.drawText(current.question,0,(mHeight*3)/4,paint);        //drawQuestionID();
 				//this should be drawed according to answer's position
-				canvas.drawText(current.candidate.get(current.choice), 60, 30, null);
+				switch(current.choice){
+					case Question.CHOICE_A:
+						canvas.drawText(current.candidate.get(Question.CHOICE_A), choiceA_X, choiceA_Y, paint);
+						break;
+					case Question.CHOICE_B:
+						canvas.drawText(current.candidate.get(Question.CHOICE_B), choiceB_X, choiceB_Y, paint);
+						break;
+					case Question.CHOICE_C:
+						canvas.drawText(current.candidate.get(Question.CHOICE_A), choiceC_X, choiceC_Y, paint);
+						break;
+				}
+				
 				Log.d("GameView", "timeCounter"+timeCounter);
 				timeCounter++;
 				if(timeCounter == WAIT_AFTER_QUESTION){
@@ -133,7 +182,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		Rect rectA = new Rect(224, 240, 280, 276);
 		Rect rectB = new Rect(224, 280, 280, 316);
 		Rect rectC = new Rect(224, 320, 280, 356);
-
+		
 		allCandidate.add(Question.CHOICE_A, rectA);
 		allCandidate.add(Question.CHOICE_B, rectB);
 		allCandidate.add(Question.CHOICE_C, rectC); 	
@@ -155,6 +204,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		if(allCandidate.get(Question.CHOICE_C).contains(x, y)){
 			current.choice = Question.CHOICE_C;
 		}
+	}
+	
+	private int dipToPs(float dip){
+		final float scale = getResources().getDisplayMetrics().density;
+		return (int)(dip * scale + 0.5f);
 	}
 	
 	@Override
