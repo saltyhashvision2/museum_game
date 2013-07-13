@@ -128,7 +128,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 					Log.d("GameView_doDraw", "BEGIN -> AFTER");
 					status = AFTER_QUESTION;
 					timeCounter = 0;
-					current.choice = Question.CHOICE_A;
+					current.choice = Question.NO_CHOICE;
 				}
 					
 				break;
