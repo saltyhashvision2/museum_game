@@ -37,12 +37,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	
 	//TextSize 
 	private static final float TEXT_SIZE=16.0f;
-	//view's height and width
-	private int mWidth;
-	private int mHeight;
+	
 	//antique's height and width
-	private int antiqueWidth;
-	private int antiqueHeight;
 	private int antique_X;
 	private int antique_Y;
     private int choiceA_X;
@@ -51,6 +47,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     private int choiceB_Y;
     private int choiceC_X;
     private int choiceC_Y;
+    private int question_X;
+    private int question_Y;
     
 	public GameView(CreativeMusem father, int missionID) {
 		super(father);				
@@ -67,16 +65,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		current = mission.question.get(questionID-1);
 		
 		dt = new DrawThread(this, getHolder());
-		//this.father = father;
-		//this.clubID = clubID;		//獲得俱樂部logo		
-		//ball = new Ball(this);		//新建足球執行緒	
-		//initPlayerInstance();		//初始化雙方隊員		
-		//initGame();					//初始化遊戲		
-		//initBitmap(father);			//初始化圖片資源			
-		
-		//ait = new AIThread(this);	//新建AI分析執行緒		
-		//bm = new BonusManager(this);//初始化BonusManager		
-		//dt = new DrawThread(this,getHolder());//新建後臺更新螢幕執行緒
 	}	
 
 	/* screen drawing method */
@@ -84,21 +72,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		Paint paint = new Paint();		
 		
 		// calculate x,y coordinate 
-		mWidth = canvas.getWidth();
-		mHeight = canvas.getHeight();
-		antiqueWidth = current.antique.bmpAntique.getWidth();
-		antiqueHeight = current.antique.bmpAntique.getHeight();
-		antique_X = (mWidth/2-antiqueWidth)/2;
-		antique_Y = (mHeight/2-antiqueHeight)/2;
-		choiceA_X = mWidth/2;
-		choiceA_Y = mHeight/4;
-		choiceB_X = mWidth/2;
-		choiceB_Y = (mHeight*2)/4;
-		choiceC_X = mWidth/2;
-		choiceC_Y = (mHeight*3)/4;
-		
-		Log.d("GameView", "mWidth = "+mWidth);
-		Log.d("GameView", "mHeight = "+mHeight);
+		calculateCoordinate(canvas.getWidth(),canvas.getHeight());
+
+		Log.d("GameView_doDraw", "mWidth = "+canvas.getWidth());
+		Log.d("GameView_doDraw", "mHeight = "+canvas.getHeight());
 		
 		canvas.drawColor(Color.BLACK); // clear screen
 		paint.setAlpha(255);
@@ -106,33 +83,49 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 			case BEFORE_QUESTION:
 				//canvas.drawBitmap(bmpBackMainView, 0, 0, paint);	//draw background
 				canvas.drawBitmap(current.antique.bmpAntique, antique_X, antique_Y, null);
-				Log.d("GameView", "timeCounter"+timeCounter);
+				Log.d("GameView_doDraw", "timeCounter"+timeCounter);
 				timeCounter++;
 				if(timeCounter == WAIT_BEFORE_QUESTION){
-					Log.d("GameView", "BEFORE -> BEGIN");
+					Log.d("GameView_doDraw", "BEFORE -> BEGIN");
 					status = BEGIN_QUESTION;
 					timeCounter = 0;
 				}
 				break;
 			case BEGIN_QUESTION:	
-				canvas.drawBitmap(current.antique.bmpAntique, antique_X, antique_Y, null);
+				canvas.drawBitmap(current.antique.bmpAntique, antique_X, antique_Y, null);			
+				// for debug, draw touch rect area
+				paint.reset();
+				paint.setAlpha(30);
+				paint.setColor(Color.RED);
+				canvas.drawRect(allCandidate.get(Question.CHOICE_A),paint);
+				paint.reset();
+				paint.setAlpha(30);
+				paint.setColor(Color.GREEN);
+				canvas.drawRect(allCandidate.get(Question.CHOICE_B),paint);
+				paint.reset();
+				paint.setAlpha(30);
+				paint.setColor(Color.YELLOW);
+				canvas.drawRect(allCandidate.get(Question.CHOICE_C),paint);
+				
+				paint.reset();
 				paint.setColor(Color.WHITE);
-				paint.setTextSize(dipToPs(TEXT_SIZE));
-				canvas.drawText(current.question, 0, (mHeight*3)/4, paint);        //drawQuestionID();
+				paint.setTextSize(dipToPx(TEXT_SIZE));
+				canvas.drawText(current.question, question_X, question_Y, paint);        //drawQuestionID();
 				canvas.drawText(current.candidate.get(Question.CHOICE_A), choiceA_X, choiceA_Y, paint);
 				canvas.drawText(current.candidate.get(Question.CHOICE_B), choiceB_X, choiceB_Y, paint);
 				canvas.drawText(current.candidate.get(Question.CHOICE_C), choiceC_X, choiceC_Y, paint);
-				Log.d("GameView", "timeCounter"+timeCounter);
+				
+				Log.d("GameView_doDraw", "timeCounter"+timeCounter);
 				timeCounter++;
-				if(current.choice != 0){
-					Log.d("GameView", "BEGIN -> AFTER");
+				if(current.choice != Question.NO_CHOICE){
+					Log.d("GameView_doDraw", "BEGIN -> AFTER");
 					status = AFTER_QUESTION;
 					timeCounter = 0;
 				}
 				
 				if(timeCounter == WAIT_USER_CHOOSE){
-					Log.d("GameView","User don't choose any answer");
-					Log.d("GameView", "BEGIN -> AFTER");
+					Log.d("GameView_doDraw","User don't choose any answer");
+					Log.d("GameView_doDraw", "BEGIN -> AFTER");
 					status = AFTER_QUESTION;
 					timeCounter = 0;
 					current.choice = Question.CHOICE_A;
@@ -141,35 +134,63 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 				break;
 			case AFTER_QUESTION:
 				canvas.drawBitmap(current.antique.bmpAntique, antique_X, antique_Y, null);
+				paint.reset();
 				paint.setColor(Color.WHITE);
-				paint.setTextSize(dipToPs(TEXT_SIZE));
-				canvas.drawText(current.question,0,(mHeight*3)/4,paint);        //drawQuestionID();
+				paint.setTextSize(dipToPx(TEXT_SIZE));
+				canvas.drawText(current.question,question_X,question_Y,paint);        //drawQuestionID();
 				//this should be drawed according to answer's position
 				switch(current.choice){
 					case Question.CHOICE_A:
+					    //for debug, paint touch area
+						paint.reset();
+						paint.setAlpha(30);
+						paint.setColor(Color.RED);
+						canvas.drawRect(allCandidate.get(Question.CHOICE_A),paint);
+						paint.reset();
+						paint.setColor(Color.WHITE);
+						paint.setTextSize(dipToPx(TEXT_SIZE));
 						canvas.drawText(current.candidate.get(Question.CHOICE_A), choiceA_X, choiceA_Y, paint);
 						break;
 					case Question.CHOICE_B:
+						//for debug, paint touch area
+						paint.reset();
+						paint.setAlpha(30);
+						paint.setColor(Color.GREEN);
+						canvas.drawRect(allCandidate.get(Question.CHOICE_B),paint);
+						paint.reset();
+						paint.setColor(Color.WHITE);
+						paint.setTextSize(dipToPx(TEXT_SIZE));
 						canvas.drawText(current.candidate.get(Question.CHOICE_B), choiceB_X, choiceB_Y, paint);
 						break;
 					case Question.CHOICE_C:
-						canvas.drawText(current.candidate.get(Question.CHOICE_A), choiceC_X, choiceC_Y, paint);
+						//for debug, paint touch area
+						paint.reset();
+						paint.setAlpha(30);
+						paint.setColor(Color.YELLOW);
+						canvas.drawRect(allCandidate.get(Question.CHOICE_C),paint);
+						paint.reset();
+						paint.setColor(Color.WHITE);
+						paint.setTextSize(dipToPx(TEXT_SIZE));
+						canvas.drawText(current.candidate.get(Question.CHOICE_C), choiceC_X, choiceC_Y, paint);
 						break;
 				}
 				
-				Log.d("GameView", "timeCounter"+timeCounter);
+				Log.d("GameView_doDraw", "timeCounter"+timeCounter);
 				timeCounter++;
 				if(timeCounter == WAIT_AFTER_QUESTION){
 					timeCounter = 0;
 					if(questionID == QUESTION_NUMBER){
-						Log.d("GameView","end of question");
+						Log.d("GameView_doDraw","end of question");
 						dt.isGameOn = false;
+						//calculate the total score 
+						mission.calculateTotalScore();
+						Log.d("GameView","Total score="+mission.score);
 					}
 					else{
 						questionID++;
-						Log.d("GameView","question "+questionID);
+						Log.d("GameView_doDraw","question "+questionID);
 						current = mission.question.get(questionID-1);
-						Log.d("GameView", "AFTER -> BEFORE");
+						Log.d("GameView_doDraw", "AFTER -> BEFORE");
 						status = BEFORE_QUESTION;
 					}
 				}	
@@ -177,49 +198,63 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		}
 	}
 	
-	//initialize touch rectangular range 
-	public void initRects(){
-		Rect rectA = new Rect(224, 240, 280, 276);
-		Rect rectB = new Rect(224, 280, 280, 316);
-		Rect rectC = new Rect(224, 320, 280, 356);
-		
-		allCandidate.add(Question.CHOICE_A, rectA);
-		allCandidate.add(Question.CHOICE_B, rectB);
-		allCandidate.add(Question.CHOICE_C, rectC); 	
+	//create empty touch area
+	private void initRects(){		
+		allCandidate.add(Question.CHOICE_A, new Rect());
+		allCandidate.add(Question.CHOICE_B, new Rect());
+		allCandidate.add(Question.CHOICE_C, new Rect()); 	
     }
+	
+	//calcuate object coordinate when doRraw
+	private void calculateCoordinate(int width, int height){
+		
+		//calculate bitmap coordinate
+		int antiqueWidth = current.antique.bmpAntique.getWidth();
+		int antiqueHeight = current.antique.bmpAntique.getHeight();
+		antique_X = (width/2-antiqueWidth)/2;
+		antique_Y = (height/2-antiqueHeight)/2;
+		choiceA_X = width/2;
+		choiceA_Y = height/4;
+		choiceB_X = width/2;
+		choiceB_Y = (height*2)/4;
+		choiceC_X = width/2;
+		choiceC_Y = (height*3)/4;
+		question_X = 0;
+		question_Y = (height*3)/4;
+		//configure touch area range
+		allCandidate.get(Question.CHOICE_A).set(width/2,0,width,height/3);
+		allCandidate.get(Question.CHOICE_B).set(width/2,height/3,width,(height*2)/3);
+		allCandidate.get(Question.CHOICE_C).set(width/2,(height*2)/3,width,height);
+	}
+	
 	
 	// Handle onTouchEvent in main activity
 	public void touchEvent(int x, int y){
+		Log.d("GameView","touch event");
 		// user choose answer A
 		if(allCandidate.get(Question.CHOICE_A).contains(x, y)){
+			Log.d("GameView", "touch answer A");
 			current.choice = Question.CHOICE_A;
 		}
 		
 		// user choose answer B
 		if(allCandidate.get(Question.CHOICE_B).contains(x, y)){
+			Log.d("GameView", "touch answer B");
 			current.choice = Question.CHOICE_B;
 		}
 		
 		// user choose answer C
 		if(allCandidate.get(Question.CHOICE_C).contains(x, y)){
+			Log.d("GameView", "touch answer C");
 			current.choice = Question.CHOICE_C;
 		}
 	}
 	
-	private int dipToPs(float dip){
+	private int dipToPx(float dip){
 		final float scale = getResources().getDisplayMetrics().density;
 		return (int)(dip * scale + 0.5f);
 	}
-	
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-	{
-	    mWidth = MeasureSpec.getSize(widthMeasureSpec);
-	    mHeight = MeasureSpec.getSize(heightMeasureSpec);
-
-	    setMeasuredDimension(mWidth, mHeight);
-	}
-	
+		
 	@Override
 	protected void finalize() throws Throwable {
 		System.out.println("############ FieldView  is dead##########");

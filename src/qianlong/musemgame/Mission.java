@@ -35,6 +35,7 @@ public class Mission {
 			case 1:
 				q1.antique.bmpAntique = BitmapFactory.decodeResource(r,R.drawable.ic_launcher);
 				q1.answer = Question.CHOICE_A;
+				q1.score = 10;
 				q1.question =r.getString(R.string.m1_q1);
 				q1.candidate.add(r.getString(R.string.m1_q1_a1));
 				q1.candidate.add(r.getString(R.string.m1_q1_a2));
@@ -42,6 +43,7 @@ public class Mission {
 
 				q2.antique.bmpAntique = BitmapFactory.decodeResource(r,R.drawable.ic_launcher);
 				q2.answer = Question.CHOICE_C;
+				q2.score = 20;
 				q2.question = r.getString(R.string.m1_q2);
 				q2.candidate.add(r.getString(R.string.m1_q2_a1));
 				q2.candidate.add(r.getString(R.string.m1_q2_a2));
@@ -49,6 +51,7 @@ public class Mission {
 
 				q3.antique.bmpAntique = BitmapFactory.decodeResource(r,R.drawable.ic_launcher);
 				q3.answer = Question.CHOICE_B;
+				q3.score = 10;
 				q3.question = r.getString(R.string.m1_q3);
 				q3.candidate.add(r.getString(R.string.m1_q3_a1));
 				q3.candidate.add(r.getString(R.string.m1_q3_a2));
@@ -56,6 +59,7 @@ public class Mission {
 
 				q4.antique.bmpAntique = BitmapFactory.decodeResource(r,R.drawable.ic_launcher);
 				q4.answer = Question.CHOICE_C;
+				q4.score = 30;
 				q4.question = r.getString(R.string.m1_q4);
 				q4.candidate.add(r.getString(R.string.m1_q4_a1));
 				q4.candidate.add(r.getString(R.string.m1_q4_a2));
@@ -63,6 +67,7 @@ public class Mission {
 
 				q5.antique.bmpAntique = BitmapFactory.decodeResource(r,R.drawable.ic_launcher);
 				q5.answer = Question.CHOICE_B;
+				q5.score = 20;
 				q5.question = r.getString(R.string.m1_q5);
 				q5.candidate.add(r.getString(R.string.m1_q5_a1));
 				q5.candidate.add(r.getString(R.string.m1_q5_a2));
@@ -76,5 +81,19 @@ public class Mission {
 				question.add(q5);	
 				break; 
 		}
+	}
+	
+	public void calculateTotalScore()
+	{
+		int index;
+		for(index=0;index<QUESTION_NUM;index++)
+		{
+			if(question.get(index).answer == question.get(index).choice)
+			{
+				score += question.get(index).score;
+			}
+		}
+		
+		return;
 	}
 }
