@@ -14,10 +14,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.util.Log;
 
-
 public class CreativeMusem extends Activity {
 	GameView gv;		//game view
 	MainView mainview;  //main view
+	ResultsView rv;
+	ObjectDescriptionView odv;
 	View     current;	//current view
 	Bitmap start;
 	Bitmap quit;
@@ -101,7 +102,8 @@ public class CreativeMusem extends Activity {
 					if(x > mainview.start_x && x < (mainview.start_x + mainview.bmpStart.getWidth()) &&
 							y > mainview.start_y && y < (mainview.start_y + mainview.bmpStart.getHeight()) ) {
 						Log.d("TAG", "Start in Game Room View!");
-						//ToDo: change to game view ?
+						// TODO: get mission ID
+						changeGameView(1);
 					}else if(x > mainview.exit_x && x < (mainview.exit_x + mainview.bmpExit.getWidth()) &&
 							y > mainview.exit_y && y < (mainview.exit_y + mainview.bmpExit.getHeight()) ) {
 						Log.d("TAG", "Exit in Game Room View!");
@@ -133,8 +135,14 @@ public class CreativeMusem extends Activity {
 					}
 					break;
 				}
-			}else if(current == gv){
+			} else if(current == gv){
 				gv.touchEvent(x,y);	//for GameView to handle touch event
+			} else if (current == rv) {
+				rv.touchEvent(x, y);
+			} else if (current == odv) {
+				odv.touchEvent(x, y);
+			} else {
+				// current is fail !
 			}
 		}
 		
@@ -147,5 +155,28 @@ public class CreativeMusem extends Activity {
 		getMenuInflater().inflate(R.menu.creative_musem, menu);
 		return true;
 	}
-
+	
+	public void changeMainView() {
+		mainview = new MainView(this);
+		this.setContentView(mainview);
+		this.current = mainview;
+	}
+	
+	public void changeGameView(int missionID) {
+		gv = new GameView(this, missionID);
+		this.setContentView(gv);
+		this.current = gv;
+	}
+	
+	public void changeResultsView(Mission mission) {
+		rv = new ResultsView(this, mission);
+		this.setContentView(rv);
+		this.current = rv;
+	}
+	
+	public void changeObjectDescriptionView(Mission mission) {
+		odv = new ObjectDescriptionView(this, mission);
+		this.setContentView(odv);
+		this.current = odv;
+	}
 }

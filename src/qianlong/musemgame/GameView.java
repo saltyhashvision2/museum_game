@@ -4,13 +4,16 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback{
+	CreativeMusem father;
 	int missionID;
 	int questionID;		// record the question number 
 	int status;			// record the game progress 
@@ -19,9 +22,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	ArrayList<Question> allQuestion = new ArrayList<Question>(5);
 	ArrayList<Rect> allCandidate = new ArrayList<Rect>(3);
 	Mission mission;	// mission
+	// Bitmaps
+	Bitmap bmpGameExit;
+	// Positions : {left, top}
+	int [] posGameExit = {10, 10};
 	Rect [] rectCandidate;
 	//Rect rectQuestion;
 	//Rect rectAntique;
+	Rect rectGameExit;
 	
 	// game progress constant 
 	private static final int BEFORE_QUESTION = 1;
@@ -37,6 +45,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	private static final int WAIT_USER_CHOOSE = 5;
 	public GameView(CreativeMusem father, int missionID) {
 		super(father);				
+		this.father = father;
 		getHolder().addCallback(this);
 		mission = new Mission(missionID);
 		mission.initMission(father);			
@@ -46,6 +55,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		this.questionID = 1;
 		this.status = BEFORE_QUESTION;
 		
+		initBitmap(father);
+		initRects();
 		dt = new DrawThread(this, getHolder());
 		//this.father = father;
 		//this.clubID = clubID;		//獲得俱樂部logo		
@@ -61,6 +72,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	
 	/* screen drawing method */
 	protected void doDraw(Canvas canvas){
+		Paint paint = new Paint();
+		canvas.drawBitmap(bmpGameExit, posGameExit[0], posGameExit[1], paint);
 		switch(status){
 			case BEFORE_QUESTION:
 				// draw question number animation 
@@ -90,6 +103,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		/* draw antique object */
 	}
 	
+	public void initBitmap(Context context){
+		Resources r = context.getResources();
+		bmpGameExit = BitmapFactory.decodeResource(r, R.drawable.game_exit);
+	}
+	
 	//initialize touch rectangular range 
 	public void initRects(){
 		rectCandidate = new Rect[3];
@@ -99,6 +117,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     	//rectQuestion = new Rect();
     	//rectAntique = new Rect();
     	
+		rectGameExit = new Rect(posGameExit[0], posGameExit[1],
+				posGameExit[0]+bmpGameExit.getWidth(),
+				posGameExit[1]+bmpGameExit.getHeight());
     }
 	
 	// Handle onTouchEvent in main activity
@@ -118,6 +139,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 		if(rectCandidate[2].contains(x, y)){
 			allQuestion.get(questionID).choice = Question.CHOICE_C;
 		}
+		// TODO: Change to ResultsView when mission end!!
+		if (rectGameExit.contains(x, y)) {
+			father.changeResultsView(mission);
+		}
 	}
 	
 	
@@ -132,14 +157,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	}
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		//if(!dt.isAlive()){
-		//	dt.start();
-		//}			 
+		if(!dt.isAlive()){
+			dt.start();
+		}			 
         //father.pmt = new PlayerMoveThread(father);//初始化並啟動球員的移動處理執行緒
         //father.pmt.start();
 	}
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
+		if (dt.isAlive()) {
+			dt.isGameOn = false;
+		}
 		//dt.isGameOn = false;	//停止更新螢幕執行緒的執行
 		//father.pmt.flag = false;
 	}
