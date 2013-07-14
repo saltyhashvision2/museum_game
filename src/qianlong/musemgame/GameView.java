@@ -23,13 +23,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	ArrayList<Rect> allCandidate = new ArrayList<Rect>(3);
 	Mission mission;	// mission
 	// Bitmaps
-	Bitmap bmpGameExit;
+	Bitmap bmpMissionEnd;
 	// Positions : {left, top}
-	int [] posGameExit = {10, 10};
+	int [] posMissionEnd = {10, 10};
 	Rect [] rectCandidate;
 	//Rect rectQuestion;
 	//Rect rectAntique;
-	Rect rectGameExit;
+	Rect rectMissionEnd;
 	
 	// game progress constant 
 	private static final int BEFORE_QUESTION = 1;
@@ -73,7 +73,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	/* screen drawing method */
 	protected void doDraw(Canvas canvas){
 		Paint paint = new Paint();
-		canvas.drawBitmap(bmpGameExit, posGameExit[0], posGameExit[1], paint);
+		canvas.drawBitmap(bmpMissionEnd, posMissionEnd[0], posMissionEnd[1], paint);
 		switch(status){
 			case BEFORE_QUESTION:
 				// draw question number animation 
@@ -105,7 +105,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	
 	public void initBitmap(Context context){
 		Resources r = context.getResources();
-		bmpGameExit = BitmapFactory.decodeResource(r, R.drawable.game_exit);
+		bmpMissionEnd = BitmapFactory.decodeResource(r, R.drawable.mission_end);
 	}
 	
 	//initialize touch rectangular range 
@@ -117,9 +117,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     	//rectQuestion = new Rect();
     	//rectAntique = new Rect();
     	
-		rectGameExit = new Rect(posGameExit[0], posGameExit[1],
-				posGameExit[0]+bmpGameExit.getWidth(),
-				posGameExit[1]+bmpGameExit.getHeight());
+		rectMissionEnd = new Rect(posMissionEnd[0], posMissionEnd[1],
+				posMissionEnd[0]+bmpMissionEnd.getWidth(),
+				posMissionEnd[1]+bmpMissionEnd.getHeight());
     }
 	
 	// Handle onTouchEvent in main activity
@@ -140,7 +140,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 			allQuestion.get(questionID).choice = Question.CHOICE_C;
 		}
 		// TODO: Change to ResultsView when mission end!!
-		if (rectGameExit.contains(x, y)) {
+		if (rectMissionEnd.contains(x, y)) {
 			father.changeResultsView(mission);
 		}
 	}
