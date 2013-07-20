@@ -2,16 +2,16 @@ package qianlong.musemgame;
 
 import java.util.ArrayList;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.annotation.SuppressLint;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+@SuppressLint("ViewConstructor")
 public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	CreativeMusem father;
 	int missionID;
@@ -19,17 +19,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	int status;			// record the game progress 
 	int timeCounter;	// current time counter 
 	DrawThread dt;		// draw screen thread 
-	ArrayList<Question> allQuestion = new ArrayList<Question>(5);
 	ArrayList<Rect> allCandidate = new ArrayList<Rect>(3);
 	Mission mission;	// mission
-	// Bitmaps
-	Bitmap bmpMissionEnd;
-	// Positions : {left, top}
-	int [] posMissionEnd = {10, 10};
-	Rect [] rectCandidate;
-	//Rect rectQuestion;
-	//Rect rectAntique;
-	Rect rectMissionEnd;
+	Question current;	// current question
+	boolean mission_complete = false;
 	
 	// game progress constant 
 	private static final int BEFORE_QUESTION = 1;
@@ -40,112 +33,239 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	private static final int QUESTION_NUMBER = 5;
 	
 	//expire time between game status
-	private static final int WAIT_BEFORE_QUESTION = 1;
-	private static final int WAIT_AFTER_QUESTION = 1;
-	private static final int WAIT_USER_CHOOSE = 5;
+	private static final int WAIT_BEFORE_QUESTION = 100;
+	private static final int WAIT_AFTER_QUESTION = 100;
+	private static final int WAIT_USER_CHOOSE = 300;
+	
+	//TextSize 
+	private static final float TEXT_SIZE=16.0f;
+	
+	//antique's height and width
+	private int antique_X;
+	private int antique_Y;
+    private int choiceA_X;
+    private int choiceA_Y;
+    private int choiceB_X;
+    private int choiceB_Y;
+    private int choiceC_X;
+    private int choiceC_Y;
+    private int question_X;
+    private int question_Y;
+    
 	public GameView(CreativeMusem father, int missionID) {
-		super(father);				
+		super(father);
 		this.father = father;
 		getHolder().addCallback(this);
 		mission = new Mission(missionID);
 		mission.initMission(father);			
 		
+		initRects();
 		/* init game settings */
 		this.missionID = missionID;
 		this.questionID = 1;
 		this.status = BEFORE_QUESTION;
 		
-		initBitmap(father);
-		initRects();
-		dt = new DrawThread(this, getHolder());
-		//this.father = father;
-		//this.clubID = clubID;		//獲得俱樂部logo		
-		//ball = new Ball(this);		//新建足球執行緒	
-		//initPlayerInstance();		//初始化雙方隊員		
-		//initGame();					//初始化遊戲		
-		//initBitmap(father);			//初始化圖片資源			
+		current = mission.question.get(questionID-1);
 		
-		//ait = new AIThread(this);	//新建AI分析執行緒		
-		//bm = new BonusManager(this);//初始化BonusManager		
-		//dt = new DrawThread(this,getHolder());//新建後臺更新螢幕執行緒
-	}
-	
+		dt = new DrawThread(this, getHolder());
+	}	
+
 	/* screen drawing method */
 	protected void doDraw(Canvas canvas){
-		Paint paint = new Paint();
-		canvas.drawBitmap(bmpMissionEnd, posMissionEnd[0], posMissionEnd[1], paint);
+		Paint paint = new Paint();		
+		
+		// calculate x,y coordinate 
+		calculateCoordinate(canvas.getWidth(),canvas.getHeight());
+
+		Log.d("GameView_doDraw", "mWidth = "+canvas.getWidth());
+		Log.d("GameView_doDraw", "mHeight = "+canvas.getHeight());
+		
+		canvas.drawColor(Color.BLACK); // clear screen
+		paint.setAlpha(255);
 		switch(status){
 			case BEFORE_QUESTION:
-				// draw question number animation 
-				//drawQuestionID();
-				
+				//canvas.drawBitmap(bmpBackMainView, 0, 0, paint);	//draw background
+				canvas.drawBitmap(current.antique.bmpAntique, antique_X, antique_Y, null);
+				Log.d("GameView_doDraw", "timeCounter"+timeCounter);
+				timeCounter++;
+				if(timeCounter == WAIT_BEFORE_QUESTION){
+					Log.d("GameView_doDraw", "BEFORE -> BEGIN");
+					status = BEGIN_QUESTION;
+					timeCounter = 0;
+				}
 				break;
-			case BEGIN_QUESTION:
-				// draw question and candidate 
-				//
+			case BEGIN_QUESTION:	
+				canvas.drawBitmap(current.antique.bmpAntique, antique_X, antique_Y, null);			
+				// for debug, draw touch rect area
+				paint.reset();
+				paint.setAlpha(30);
+				paint.setColor(Color.RED);
+				canvas.drawRect(allCandidate.get(Question.CHOICE_A),paint);
+				paint.reset();
+				paint.setAlpha(30);
+				paint.setColor(Color.GREEN);
+				canvas.drawRect(allCandidate.get(Question.CHOICE_B),paint);
+				paint.reset();
+				paint.setAlpha(30);
+				paint.setColor(Color.YELLOW);
+				canvas.drawRect(allCandidate.get(Question.CHOICE_C),paint);
 				
+				paint.reset();
+				paint.setColor(Color.WHITE);
+				paint.setTextSize(dipToPx(TEXT_SIZE));
+				canvas.drawText(current.question, question_X, question_Y, paint);        //drawQuestionID();
+				canvas.drawText(current.candidate.get(Question.CHOICE_A), choiceA_X, choiceA_Y, paint);
+				canvas.drawText(current.candidate.get(Question.CHOICE_B), choiceB_X, choiceB_Y, paint);
+				canvas.drawText(current.candidate.get(Question.CHOICE_C), choiceC_X, choiceC_Y, paint);
+				
+				Log.d("GameView_doDraw", "timeCounter"+timeCounter);
+				timeCounter++;
+				if(current.choice != Question.NO_CHOICE){
+					Log.d("GameView_doDraw", "BEGIN -> AFTER");
+					status = AFTER_QUESTION;
+					timeCounter = 0;
+				}
+				
+				if(timeCounter == WAIT_USER_CHOOSE){
+					Log.d("GameView_doDraw","User don't choose any answer");
+					Log.d("GameView_doDraw", "BEGIN -> AFTER");
+					status = AFTER_QUESTION;
+					timeCounter = 0;
+					current.choice = Question.NO_CHOICE;
+				}
+					
 				break;
 			case AFTER_QUESTION:
-				if(questionID == QUESTION_NUMBER){
-					
+				canvas.drawBitmap(current.antique.bmpAntique, antique_X, antique_Y, null);
+				paint.reset();
+				paint.setColor(Color.WHITE);
+				paint.setTextSize(dipToPx(TEXT_SIZE));
+				canvas.drawText(current.question,question_X,question_Y,paint);        //drawQuestionID();
+				//this should be drawed according to answer's position
+				switch(current.choice){
+					case Question.CHOICE_A:
+					    //for debug, paint touch area
+						paint.reset();
+						paint.setAlpha(30);
+						paint.setColor(Color.RED);
+						canvas.drawRect(allCandidate.get(Question.CHOICE_A),paint);
+						paint.reset();
+						paint.setColor(Color.WHITE);
+						paint.setTextSize(dipToPx(TEXT_SIZE));
+						canvas.drawText(current.candidate.get(Question.CHOICE_A), choiceA_X, choiceA_Y, paint);
+						break;
+					case Question.CHOICE_B:
+						//for debug, paint touch area
+						paint.reset();
+						paint.setAlpha(30);
+						paint.setColor(Color.GREEN);
+						canvas.drawRect(allCandidate.get(Question.CHOICE_B),paint);
+						paint.reset();
+						paint.setColor(Color.WHITE);
+						paint.setTextSize(dipToPx(TEXT_SIZE));
+						canvas.drawText(current.candidate.get(Question.CHOICE_B), choiceB_X, choiceB_Y, paint);
+						break;
+					case Question.CHOICE_C:
+						//for debug, paint touch area
+						paint.reset();
+						paint.setAlpha(30);
+						paint.setColor(Color.YELLOW);
+						canvas.drawRect(allCandidate.get(Question.CHOICE_C),paint);
+						paint.reset();
+						paint.setColor(Color.WHITE);
+						paint.setTextSize(dipToPx(TEXT_SIZE));
+						canvas.drawText(current.candidate.get(Question.CHOICE_C), choiceC_X, choiceC_Y, paint);
+						break;
 				}
-				else{
-					questionID++;
-					status = BEFORE_QUESTION;
-				}
-					
+				
+				Log.d("GameView_doDraw", "timeCounter"+timeCounter);
+				timeCounter++;
+				if(timeCounter == WAIT_AFTER_QUESTION){
+					timeCounter = 0;
+					if(questionID == QUESTION_NUMBER){
+						Log.d("GameView_doDraw","end of question");
+						dt.isGameOn = false;
+						//calculate the total score 
+						mission.calculateTotalScore();
+						Log.d("GameView","Total score="+mission.score);
+						mission_complete = true;
+					}
+					else{
+						questionID++;
+						Log.d("GameView_doDraw","question "+questionID);
+						current = mission.question.get(questionID-1);
+						Log.d("GameView_doDraw", "AFTER -> BEFORE");
+						status = BEFORE_QUESTION;
+					}
+				}	
 				break;
 		}
-		/* draw question animation */
-		
-		/* draw question */
-		
-		/* draw antique object */
 	}
 	
-	public void initBitmap(Context context){
-		Resources r = context.getResources();
-		bmpMissionEnd = BitmapFactory.decodeResource(r, R.drawable.mission_end);
-	}
-	
-	//initialize touch rectangular range 
-	public void initRects(){
-		rectCandidate = new Rect[3];
-    	for(int i=0;i<3;i++){
-    		rectCandidate[i] = new Rect(244,200+40*i,280,236+40*i);
-    	}
-    	//rectQuestion = new Rect();
-    	//rectAntique = new Rect();
-    	
-		rectMissionEnd = new Rect(posMissionEnd[0], posMissionEnd[1],
-				posMissionEnd[0]+bmpMissionEnd.getWidth(),
-				posMissionEnd[1]+bmpMissionEnd.getHeight());
+	//create empty touch area
+	private void initRects(){		
+		allCandidate.add(Question.CHOICE_A, new Rect());
+		allCandidate.add(Question.CHOICE_B, new Rect());
+		allCandidate.add(Question.CHOICE_C, new Rect()); 	
     }
+	
+	//calcuate object coordinate when doRraw
+	private void calculateCoordinate(int width, int height){
+		
+		//calculate bitmap coordinate
+		int antiqueWidth = current.antique.bmpAntique.getWidth();
+		int antiqueHeight = current.antique.bmpAntique.getHeight();
+		antique_X = (width/2-antiqueWidth)/2;
+		antique_Y = (height/2-antiqueHeight)/2;
+		choiceA_X = width/2;
+		choiceA_Y = height/4;
+		choiceB_X = width/2;
+		choiceB_Y = (height*2)/4;
+		choiceC_X = width/2;
+		choiceC_Y = (height*3)/4;
+		question_X = 0;
+		question_Y = (height*3)/4;
+		//configure touch area range
+		allCandidate.get(Question.CHOICE_A).set(width/2,0,width,height/3);
+		allCandidate.get(Question.CHOICE_B).set(width/2,height/3,width,(height*2)/3);
+		allCandidate.get(Question.CHOICE_C).set(width/2,(height*2)/3,width,height);
+	}
+	
 	
 	// Handle onTouchEvent in main activity
 	public void touchEvent(int x, int y){
+		Log.d("GameView","touch event");
+		
+		// check if mission complete
+		if (mission_complete == true) {
+			//change to "ResultsView"
+			father.changeResultsView(mission);
+		}
 		
 		// user choose answer A
-		if(rectCandidate[0].contains(x, y)){
-			allQuestion.get(questionID).choice = Question.CHOICE_A;
+		if(allCandidate.get(Question.CHOICE_A).contains(x, y)){
+			Log.d("GameView", "touch answer A");
+			current.choice = Question.CHOICE_A;
 		}
 		
 		// user choose answer B
-		if(rectCandidate[1].contains(x, y)){
-			allQuestion.get(questionID).choice = Question.CHOICE_B;
+		if(allCandidate.get(Question.CHOICE_B).contains(x, y)){
+			Log.d("GameView", "touch answer B");
+			current.choice = Question.CHOICE_B;
 		}
 		
 		// user choose answer C
-		if(rectCandidate[2].contains(x, y)){
-			allQuestion.get(questionID).choice = Question.CHOICE_C;
-		}
-		// TODO: Change to ResultsView when mission end!!
-		if (rectMissionEnd.contains(x, y)) {
-			father.changeResultsView(mission);
+		if(allCandidate.get(Question.CHOICE_C).contains(x, y)){
+			Log.d("GameView", "touch answer C");
+			current.choice = Question.CHOICE_C;
 		}
 	}
 	
-	
+	private int dipToPx(float dip){
+		final float scale = getResources().getDisplayMetrics().density;
+		return (int)(dip * scale + 0.5f);
+	}
+		
 	@Override
 	protected void finalize() throws Throwable {
 		System.out.println("############ FieldView  is dead##########");
@@ -165,10 +285,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	}
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		if (dt.isAlive()) {
-			dt.isGameOn = false;
-		}
-		//dt.isGameOn = false;	//停止更新螢幕執行緒的執行
+		dt.isGameOn = false;	//停止更新螢幕執行緒的執行
 		//father.pmt.flag = false;
 	}
 }
