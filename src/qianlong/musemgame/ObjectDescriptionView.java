@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
@@ -15,10 +16,25 @@ public class ObjectDescriptionView extends SurfaceView implements SurfaceHolder.
 	CreativeMusem father;
 	ObjectDescriptionDrawThread odt;
 	Mission mission_result;
+	
+	int intScreenWidth = 0;
+	int intScreentHeight = 0;
+	
+	int intHeightOfObject = 75;
+	int intWidthOfAntique = 90;
+	int intHeightOfAntique = 150;
+	
+	// String: Object description
+	String strAntique = "Antique Description";
+	
 	// Bitmaps
+	Bitmap bmpAntique;
 	Bitmap bmpReturn;
+	
 	// Positions : {left, top}
-	int [] posReturn = {10, 10};
+	int [] posAntique = {10, 10};
+	int [] posAntiqueDescr = {10, 500};
+	int [] posReturn = {10, 715};
 	// Rects
 	Rect rectReturn;
 	
@@ -35,12 +51,23 @@ public class ObjectDescriptionView extends SurfaceView implements SurfaceHolder.
 	
 	public void doDraw(Canvas canvas) {
 		Paint paint = new Paint();
+		
+		paint.setTextSize(28);
+		paint.setColor(Color.WHITE);
+		// Default x:left y:baseline
+		canvas.drawText(strAntique, posAntiqueDescr[0], posAntiqueDescr[1] + intHeightOfObject, paint);
+		if (bmpAntique != null) {
+			canvas.drawBitmap(bmpAntique , posAntique[0], posAntique[1], paint);
+		}
+		//Return Button
 		canvas.drawBitmap(bmpReturn, posReturn[0], posReturn[1], paint);
 	}
 	
 	public void initBitmap(Context context){
 		Resources r = context.getResources();
 		bmpReturn = BitmapFactory.decodeResource(r, R.drawable.object_description_return);
+		bmpAntique = BitmapFactory.decodeResource(r, R.drawable.antique1);
+		bmpAntique = Bitmap.createScaledBitmap(bmpAntique, 400, 300, false);
 	}
 	
 	//initialize touch rectangular range 
